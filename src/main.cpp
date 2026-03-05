@@ -4,7 +4,7 @@
 #include <csignal>
 
 // TODO: Include custom headers once ready
-// #include "memory/MemoryPool.hpp"
+#include "../include/hyperion/memory/MemoryPool.hpp"
 // #include "utils/SPSCQueue.hpp"
 // #include "matching/Engine.hpp"
 // #include "network/Ingress.hpp"
