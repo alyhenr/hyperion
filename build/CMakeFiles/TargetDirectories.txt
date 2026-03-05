@@ -1,0 +1,3 @@
+/Users/alyssonalmeida/github/hyperion/build/CMakeFiles/hyperion.dir
+/Users/alyssonalmeida/github/hyperion/build/CMakeFiles/edit_cache.dir
+/Users/alyssonalmeida/github/hyperion/build/CMakeFiles/rebuild_cache.dir
