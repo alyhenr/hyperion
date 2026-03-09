@@ -18,6 +18,53 @@ void signal_handler(int signum) {
     g_running.store(false, std::memory_order_release);
 }
 
+// A dummy struct simulating a network order
+struct Order {
+    uint64_t order_id;
+    double price;
+    uint32_t quantity;
+    char side;
+};
+
+void run_pool_test() {
+    std::cout << "--- Testing Memory Pool ---\n";
+    const size_t POOL_SIZE = 1'000'000;;
+    
+    hyperion::memory::MemoryPool<Order> pool(POOL_SIZE);
+    std::cout << "Pool created with capacity: " << pool.capacity() << "\n";
+
+    // 1. Time the allocation of 1 million orders
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    std::vector<Order*> active_orders;
+    active_orders.reserve(POOL_SIZE);
+
+    for (size_t i = 0; i < POOL_SIZE; ++i) {
+        Order* order = pool.allocate();
+        order->order_id = i;
+        active_orders.push_back(order);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    
+    std::cout << "Allocated " << POOL_SIZE << " objects in " << duration_ms << " ms.\n";
+    std::cout << "Available slots: " << pool.available() << "\n";
+
+    // 2. Time the deallocation
+    start = std::chrono::high_resolution_clock::now();
+    
+    for (Order* order : active_orders) {
+        pool.deallocate(order);
+    }
+
+    end = std::chrono::high_resolution_clock::now();
+    duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "Deallocated " << POOL_SIZE << " objects in " << duration_ms << " ms.\n";
+    std::cout << "Available slots: " << pool.available() << "\n";
+}
+
 // TODO: Implement a utility function to pin a thread to a specific CPU core
 // void pin_thread_to_core(std::thread& t, int core_id) {
 //     // Hint: Look up pthread_setaffinity_np for Linux
@@ -67,7 +114,7 @@ int main() {
     // pin_thread_to_core(matching_thread, 4); 
 
     // std::cout << "[Orchestrator] Hyperion is live. Awaiting orders.\n";
-
+    run_pool_test();
     // // 6. Main thread waits for shutdown signal
     while (g_running.load(std::memory_order_acquire)) {
         // Main thread can handle low-priority telemetry, logging, or just sleep.

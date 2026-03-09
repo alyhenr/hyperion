@@ -1,43 +1,70 @@
-// 1. Include Guards or #pragma once to prevent double inclusion
-#ifndef MEMORY_POOL_HPP
-#define MEMORY_POOL_HPP
+#pragma once
 
-#include <iostream> // Necessary dependencies
 #include <vector>
+#include <cstddef>
+#include <stdexcept>
+#include <cassert>
+#include <iostream> // Needed for std::cout
 
-// 2. Class Declaration
+namespace hyperion::memory {
+
 template <typename T>
 class MemoryPool {
-public:
-    MemoryPool(T value);
-    T* allocate(size_t size);
-    int allocate(T* slot);
-    void display() const;
 private:
-    T data;
-    std::vector<T*> free_list;
+    std::vector<T> store_;
+    std::vector<T*> free_list_;
 
+public:
+    // Constructor using a Member Initialization List for max efficiency
+    explicit MemoryPool(size_t capacity) : store_(capacity) {
+        // Reserve memory for the pointers so push_back NEVER triggers an OS reallocation
+        free_list_.reserve(capacity); 
+
+        // Populate the free list with the addresses of our pre-allocated objects
+        for (T& pos : store_) {
+            free_list_.push_back(&pos);
+        }
+    }
+
+    // Prevent copying
+    MemoryPool(const MemoryPool&) = delete;
+    MemoryPool& operator=(const MemoryPool&) = delete;
+
+    // $O(1)$ Allocation
+    T* allocate() {
+        if (free_list_.empty()) {
+            throw std::bad_alloc();
+        }
+        
+        T* free_slot = free_list_.back();
+        free_list_.pop_back();
+        return free_slot;
+    }
+
+    // $O(1)$ Deallocation
+    void deallocate(T* ptr) {
+        if (ptr == nullptr) return;
+
+        // Safety check: Does this pointer actually belong to our contiguous block?
+        T* store_start = store_.data();
+        T* store_end = store_start + store_.size();
+
+        if (ptr < store_start || ptr >= store_end) {
+            std::cerr << "[MEMORY POOL FATAL]: Bad deallocation, pointer out of range." << std::endl;
+            assert(false);
+        }
+
+        free_list_.push_back(ptr);
+    }
+
+    // Utility
+    size_t available() const {
+        return free_list_.size();
+    }
+    
+    size_t capacity() const {
+        return store_.size();
+    }
 };
 
-// 3. Method Definitions (must stay in the header)
-template <typename T>
-MemoryPool<T>::MemoryPool(T value) : data(value) {}
-
-template <typename T>
-void MemoryPool<T>::display() const {
-    std::cout << "Value: " << data << std::endl;
-}
-
-template <typename T>
-T* MemoryPool<T>::allocate(size_t size) {
-    std::cout <<  size << std::endl;
-    return &data;
-}
-
-template <typename T>
-int MemoryPool<T>::allocate(T* slot) {
-    data = slot;
-    return 0;
-}
-
-#endif
+} // namespace hyperion::memory
