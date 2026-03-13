@@ -6,6 +6,7 @@
 // TODO: Include custom headers once ready
 #include "../include/hyperion/memory/MemoryPool.hpp"
 #include "../include/hyperion/utils/SPSCQueue.hpp"
+#include "../include/hyperion/matching/Order.hpp"
 // #include "matching/Engine.hpp"
 // #include "network/Ingress.hpp"
 // #include "network/Egress.hpp"

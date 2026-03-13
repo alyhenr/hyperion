@@ -24,7 +24,7 @@ TEST(SPSCQueueTest, BasicPushPop) {
     EXPECT_FALSE(queue.pop(val)); // Queue should be empty
 }
 
-// --- The Crucible: Multi-Threaded Stress Test ---
+// --- Multi-Threaded Stress Test ---
 TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
     const size_t QUEUE_CAPACITY = 1024;
     const int MESSAGES_TO_SEND = 1'000'000;
@@ -34,10 +34,6 @@ TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
     // This thread will push numbers 1 to MESSAGES_TO_SEND
     std::thread producer([&]() {
         for (int i = 1; i <= MESSAGES_TO_SEND; ++i) {
-            // TODO: Attempt to push 'i' into the queue.
-            // If the queue is full (push returns false), you must retry.
-            // Hint: Use a while loop. To prevent locking up the CPU completely,
-            // you can call std::this_thread::yield() inside the retry loop.
             while(!queue.push(i)) std::this_thread::yield();
         }
     });
@@ -48,11 +44,7 @@ TEST(SPSCQueueTest, ConcurrentProducerConsumer) {
         
         while (expected_value <= MESSAGES_TO_SEND) {
             int received_value = 0;
-            
-            // TODO: Attempt to pop from the queue.
-            // If it succeeds, use ASSERT_EQ(received_value, expected_value) to prove FIFO ordering.
-            // Then increment expected_value.
-            // If it fails (queue is empty), yield the thread and try again.
+
             while(!queue.pop(received_value)) std::this_thread::yield();
 
             ASSERT_EQ(received_value, expected_value);
