@@ -4,10 +4,10 @@
 #include <csignal>
 
 // TODO: Include custom headers once ready
-#include "../include/hyperion/memory/MemoryPool.hpp"
-#include "../include/hyperion/utils/SPSCQueue.hpp"
-#include "../include/hyperion/matching/Order.hpp"
-#include "../include/hyperion/matching/OrderBook.hpp"
+#include "hyperion/memory/MemoryPool.hpp"
+#include "hyperion/utils/SPSCQueue.hpp"
+#include "hyperion/matching/Order.hpp"
+#include "hyperion/matching/OrderBook.hpp"
 // #include "matching/Engine.hpp"
 // #include "network/Ingress.hpp"
 // #include "network/Egress.hpp"
@@ -28,12 +28,14 @@ struct Order {
     char side;
 };
 
-void run_orderbook_test() {
+hyperion::matching::OrderBook* run_orderbook_test() {
     std::cout << "--- Running Order Book Test ---\n";
 
     hyperion::matching::OrderBook* order_book = new hyperion::matching::OrderBook(1, 1500, 1, 1000);
 
     std::cout << order_book->to_string() << std::endl;
+
+    return order_book;
 }
 
 void run_pool_test() {
@@ -125,7 +127,12 @@ int main() {
 
     // std::cout << "[Orchestrator] Hyperion is live. Awaiting orders.\n";
     run_pool_test();
-    run_orderbook_test();
+    hyperion::matching::OrderBook* ob = run_orderbook_test();
+
+    hyperion::matching::Order* test_order = new hyperion::matching::Order();
+    test_order->price = 5;
+
+    ob->add_order(test_order);
     // // 6. Main thread waits for shutdown signal
     while (g_running.load(std::memory_order_acquire)) {
         // Main thread can handle low-priority telemetry, logging, or just sleep.

@@ -15,8 +15,8 @@ private:
     std::vector<PriceLevel> asks_;
     std::vector<Order*> order_map_;
 
-    // uint64_t best_bid_price_{0};
-    // uint64_t best_ask_price_{UINT64_MAX};
+    uint64_t best_bid_price_{0};
+    uint64_t best_ask_price_{UINT64_MAX};
 
     uint64_t min_price_;
     uint64_t max_price_;
@@ -61,8 +61,8 @@ public:
     }
     
     // TODO:
-    // void add_order(Order* order);
-    // void cancel_order(uint64_t order_id);
+    void add_order(Order* order);
+    void cancel_order(uint64_t order_id);
 };
 
 } // namespace hyperion::matching

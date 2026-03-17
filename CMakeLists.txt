@@ -10,12 +10,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror -O3 -ma
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # We will add subdirectories for tests and benchmarks later
 # add_subdirectory(tests)
 # add_subdirectory(benchmarks)
 
-add_executable(hyperion src/main.cpp)
+add_executable(hyperion 
+  src/main.cpp
+  src/matching/OrderBook.cpp
+)
 
 # --- Testing Framework (Google Test) ---
 include(FetchContent)
