@@ -48,14 +48,50 @@ void OrderBook::cancel_order(uint64_t order_id) {
     // 4. Execute Pointer Surgery
     if (order->side == Side::BUY) {
         bids_[idx].remove_order(order);
+
+        // 5. Clear the Map
+        order_map_[order_id] = nullptr;
+
+        if (order->price == best_bid_price_) update_best_bid();
     } else {
         asks_[idx].remove_order(order);
+
+        // 5. Clear the Map
+        order_map_[order_id] = nullptr;
+        if (order->price == best_ask_price_) update_best_ask();
+    }
+}
+
+oid OrderBook::update_best_bid() {
+    // Cast to signed integer so can safely drop below 0
+    int idx = static_cast<int>(price_to_index(best_bid_price_));
+    
+    while (idx >= 0 && bids_[idx].is_empty()) {
+        --idx;
     }
 
-    // 5. Clear the Map
-    order_map_[order_id] = nullptr;
+    // If we fell off the bottom of the array, the book is empty on the bid side
+    if (idx < 0) {
+        best_bid_price_ = 0;
+    } else {
+        best_bid_price_ = bids_[idx].price;
+    }
+}
 
-    // TODO: Update best_bid_price_ and best_ask_price_
+void OrderBook::update_best_ask() {
+    int idx = static_cast<int>(price_to_index(best_ask_price_));
+    int max_idx = static_cast<int>(asks_.size() - 1);
+    
+    while (idx <= max_idx && asks_[idx].is_empty()) {
+        ++idx;
+    }
+
+    // If we fell off the top of the array, the book is empty on the ask side
+    if (idx > max_idx) {
+        best_ask_price_ = UINT64_MAX;
+    } else {
+        best_ask_price_ = asks_[idx].price;    
+    }
 }
 
 } // namespace hyperion::matching
