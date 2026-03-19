@@ -26,6 +26,9 @@ private:
         return (price - min_price_) / tick_size_;
     }
 
+    void update_best_bid();
+    void update_best_ask();
+
 public:
     OrderBook(uint64_t min_price, uint64_t max_price, uint64_t tick_size, size_t max_orders) 
         : min_price_(min_price), max_price_(max_price), tick_size_(tick_size) {

@@ -34,4 +34,28 @@ void OrderBook::add_order(Order* order) {
     }
 }
 
+void OrderBook::cancel_order(uint64_t order_id) {
+    // 1. Safety Check: Is the ID within our array bounds?
+    if (order_id >= order_map_.size()) return;
+
+    // 2. Lookup
+    Order* order = order_map_[order_id];
+    if (order == nullptr) return; // Order doesn't exist or already canceled
+
+    // 3. Locate Array Slot
+    size_t idx = price_to_index(order->price);
+
+    // 4. Execute Pointer Surgery
+    if (order->side == Side::BUY) {
+        bids_[idx].remove_order(order);
+    } else {
+        asks_[idx].remove_order(order);
+    }
+
+    // 5. Clear the Map
+    order_map_[order_id] = nullptr;
+
+    // TODO: Update best_bid_price_ and best_ask_price_
+}
+
 } // namespace hyperion::matching
