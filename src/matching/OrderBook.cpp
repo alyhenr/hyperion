@@ -62,7 +62,7 @@ void OrderBook::cancel_order(uint64_t order_id) {
     }
 }
 
-oid OrderBook::update_best_bid() {
+void OrderBook::update_best_bid() {
     // Cast to signed integer so can safely drop below 0
     int idx = static_cast<int>(price_to_index(best_bid_price_));
     

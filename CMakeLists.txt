@@ -19,6 +19,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 add_executable(hyperion 
   src/main.cpp
   src/matching/OrderBook.cpp
+  src/matching/Engine.cpp
 )
 
 # --- Testing Framework (Google Test) ---

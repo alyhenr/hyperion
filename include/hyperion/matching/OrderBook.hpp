@@ -9,7 +9,10 @@
 
 namespace hyperion::matching {
 
+class Engine;
+
 class OrderBook {
+    friend class Engine;
 private:
     std::vector<PriceLevel> bids_;
     std::vector<PriceLevel> asks_;
