@@ -8,7 +8,7 @@
 #include "hyperion/utils/SPSCQueue.hpp"
 #include "hyperion/matching/Order.hpp"
 #include "hyperion/matching/OrderBook.hpp"
-// #include "matching/Engine.hpp"
+#include "hyperion/matching/Engine.hpp"
 // #include "network/Ingress.hpp"
 // #include "network/Egress.hpp"
 
@@ -131,6 +131,9 @@ int main() {
 
     hyperion::matching::Order* test_order = new hyperion::matching::Order();
     test_order->price = 5;
+
+    hyperion::matching::Engine* engine = new hyperion::matching::Engine(*ob);
+    engine->process_order(test_order);
 
     ob->add_order(test_order);
     // // 6. Main thread waits for shutdown signal
